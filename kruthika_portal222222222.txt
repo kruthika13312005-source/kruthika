@@ -1,0 +1,626 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kruthika Electricals - Booking Portal</title>
+    <style>
+        :root {
+            --primary: #0066cc; /* Sleek Electrical Blue */
+            --secondary: #2c3e50; /* Deep Blue Slate */
+            --success: #25D366; /* WhatsApp Green */
+            --light-bg: #f8f9fa;
+            --surface: #ffffff;
+            --text: #2d3436;
+            --text-muted: #7f8c8d;
+            --radius: 16px;
+        }
+
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background: var(--light-bg); 
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* App Shell Layout */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--surface);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        header {
+            background: var(--secondary);
+            color: #fff;
+            padding: 22px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.5px; }
+        header p { margin: 6px 0 0; font-size: 11px; color: #9bc5ff; font-weight: 600; letter-spacing: 1px; }
+
+        .main-content {
+            flex: 1;
+            padding: 24px;
+            padding-bottom: 100px; /* Space for bottom navigation */
+        }
+
+        .page { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .page.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 { font-size: 20px; color: var(--secondary); margin-top: 0; margin-bottom: 16px; font-weight: 700; text-align: center; }
+
+        /* Component: Cards & Lists */
+        .card {
+            background: var(--light-bg);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #edf2f7;
+        }
+
+        /* Business Card Image Styling */
+        .business-card-display {
+            width: 100%;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: block;
+        }
+
+        .service-list { list-style: none; padding: 0; margin: 0; }
+        .service-item {
+            background: var(--surface);
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        /* Form Controls */
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-size: 13px; font-weight: 600; color: var(--secondary); margin-bottom: 6px; }
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.2s;
+            background: #fff;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        /* Buttons */
+        button {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        button:active { transform: scale(0.98); }
+        
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #0052a3; }
+        .btn-whatsapp { background: var(--success); color: white; margin-top: 15px; }
+        .btn-whatsapp:hover { background: #1ebd56; }
+        
+        /* Database Display Row */
+        .db-item {
+            background: #f1f2f6;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+            border-left: 3px solid var(--primary);
+        }
+
+        /* Status Indicator */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #dfe6e9;
+            margin-bottom: 15px;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* Fixed App Navigation Bottom Bar */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: var(--surface);
+            border-top: 1px solid #edf2f7;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            background: none;
+            border: none;
+            padding: 8px 0;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .nav-item.active-nav { color: var(--primary); font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1>KRUTHIKA ELECTRICALS</h1>
+        <p>CLASS-1 ELECTRICAL CONTRACTOR & ENGINEERS</p>
+    </header>
+
+    <div class="main-content">
+        
+        <section id="aboutPage" class="page active">
+            <h2>Corporate Profile</h2>
+            
+            <img src="business_card.jpg" alt="Kruthika Electricals Business Card" class="business-card-display">
+
+            <div class="card" style="background: #e6f0fa; border-color: #ccdff5;">
+                <h3 style="margin:0 0 8px 0; color: var(--primary); font-size:16px;">Corporate Identity</h3>
+                <p style="margin: 0; font-size: 14px; line-height: 1.5;"><strong>GSTIN:</strong> 29AGOPV2441G1ZZ</p>
+                <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-muted);">Registered Class-1 Engineering Firm</p>
+            </div>
+            
+            <div class="card">
+                <h3 style="margin:0 0 8px 0; font-size: 15px;">Registered Office Address</h3>
+                <p style="margin:0; font-size:13px; color: var(--text-muted); line-height:1.4;">
+                    # 45/A, 2nd Floor, 4th Cross, Adarsha Nagar,<br>
+                    Near Matha School, Nagarabhavi 1st Stage,<br>
+                    Bengaluru — 560072.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3 style="margin:0 0 8px 0; font-size: 15px;">Direct Business Line</h3>
+                <p style="margin:4px 0; font-size:14px;">📞 Hotline: <strong>+91 9980900314</strong></p>
+            </div>
+
+            <h3 style="font-size: 15px; margin-top: 25px; color: var(--secondary);">Database History Log (Saved Locally)</h3>
+            <div id="display" style="max-height: 180px; overflow-y: auto;"></div>
+        </section>
+
+        <section id="servicePage" class="page">
+            <h2>Our Core Engineering Capabilities</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; text-align: center;">Providing professional electrical infrastructure installations across Bengaluru.</p>
+            <ul class="service-list">
+                <li class="service-item">⚡ All Types of HT & LT Panel Works</li>
+                <li class="service-item">⚙️ DG AMF Panels & Automation Systems</li>
+                <li class="service-item">🔌 Heavy Bus Ducts & Stabilizers Setup</li>
+                <li class="service-item">🔄 Industrial Motors & Central UPS Engineering</li>
+            </ul>
+        </section>
+
+        <section id="bookingPage" class="page">
+            <h2>Book a Service Visit</h2>
+            <div id="locStatus" class="status-badge">🔄 Click "Allow" to share your work-site GPS location</div>
+            
+            <div class="form-group">
+                <label>Your Full Name</label>
+                <input type="text" id="custName" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+                <label>Contact Mobile Number</label>
+                <input type="tel" id="custPhone" placeholder="Enter 10-digit number">
+            </div>
+            <div class="form-group">
+                <label>Site Address</label>
+                <textarea id="custAddr" placeholder="Complete site address where service is required" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Select Required Service</label>
+                <select id="serviceType">
+                    <option value="">-- Select Service Type --</option>
+                    <option value="HT/LT Panel Works">HT, LT Panel Works</option>
+                    <option value="DG AMF Panels">DG AMF & Synchronizing Panels</option>
+                    <option value="Bus Ducts / Stabilizers">Bus Ducts & Stabilizers</option>
+                    <option value="Motors / UPS Installation">Motors, Pumps & UPS Works</option>
+                </select>
+            </div>
+
+            <button class="btn-primary" onclick="submitBooking()">Confirm & Book Request</button>
+        </section>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active-nav" id="nav-about" onclick="navTo('aboutPage')">🏢 Our Info</button>
+        <button class="nav-item" id="nav-services" onclick="navTo('servicePage')">🛠️ Services</button>
+        <button class="nav-item" id="nav-booking" onclick="navTo('bookingPage')">📋 Book Now</button>
+    </nav>
+</div>
+
+<script>
+    let currentCoords = "Not provided by customer";
+
+    function navTo(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
+        
+        document.getElementById(pageId).classList.add('active');
+        
+        if(pageId === 'aboutPage') {
+            document.getElementById('nav-about').classList.add('active-nav');
+            loadDatabaseData(); 
+        }
+        if(pageId === 'servicePage') {
+            document.getElementById('nav-services').classList.add('active-nav');
+        }
+        if(pageId === 'bookingPage') {
+            document.getElementById('nav-booking').classList.add('active-nav');
+            handleLocation();
+        }
+    }
+
+    function handleLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    currentCoords = `http://googleusercontent.com/maps.google.com/6{pos.coords.latitude},${pos.coords.longitude}`;
+                    const statusElement = document.getElementById('locStatus');
+                    statusElement.innerText = "✅ Work-site GPS Coordinates Captured";
+                    statusElement.style.background = "#d4edda";
+                    statusElement.style.color = "#155724";
+                },
+                () => {
+                    console.log("Location access declined.");
+                }
+            );
+        }
+    }
+
+    window.onload = function() {
+        loadDatabaseData();
+    };
+
+    function loadDatabaseData() {
+        const localData = localStorage.getItem('kruthika_customer_bookings');
+        const logs = localData ? JSON.parse(localData) : [];
+        
+        if(logs.length === 0) {
+            document.getElementById('display').innerHTML = `<p style="font-size:13px; color:var(--text-muted); text-align:center;">No previous history found on this device.</p>`;
+            return;
+        }
+
+        document.getElementById('display').innerHTML = logs.map(item => `
+            <div class="db-item">
+                <strong>${item.name}</strong> requested <strong>${item.service}</strong> <br>
+                <small style="color: var(--text-muted);">${item.date}</small>
+            </div>
+        `).join('');
+    }
+
+    function submitBooking() {
+        const name = document.getElementById('custName').value;
+        const phone = document.getElementById('custPhone').value;
+        const addr = document.getElementById('custAddr').value;
+        const service = document.getElementById('serviceType').value;
+
+        if(!name || !phone || !addr || !service) {
+            alert("Please complete all requested booking information fields.");
+            return;
+        }
+
+        const localData = localStorage.getItem('kruthika_customer_bookings');
+        const logs = localData ? JSON.parse(localData) : [];
+        const currentTimestamp = new Date().toLocaleString();
+        
+        logs.unshift({ name: name, service: service, phone: phone, address: addr, date: currentTimestamp });
+        localStorage.setItem('kruthika_customer_bookings', JSON.stringify(logs));
+        
+        const officialWhatsAppNumber = "919980900314"; 
+        
+        const messageText = `*KRUTHIKA ELECTRICALS - NEW CLIENT REQUEST*%0A%0A` +
+                            `*Customer Name:* ${encodeURIComponent(name)}%0A` +
+                            `*Mobile Number:* ${encodeURIComponent(phone)}%0A` +
+                            `*Required Service:* ${encodeURIComponent(service)}%0A` +
+                            `*Site Location:* ${encodeURIComponent(addr)}%0A%0A` +
+                            `*Google Maps Work-Site Link:*%0A${encodeURIComponent(currentCoords)}`;
+
+        alert("Thank you! Your details have been securely logged. Click OK to instantly forward your booking to Kruthika Electricals on WhatsApp.");
+        window.open(`https://wa.me/${officialWhatsAppNumber}?text=${messageText}`, '_blank');
+        
+        document.getElementById('custName').value = '';
+        document.getElementById('custPhone').value = '';
+        document.getElementById('custAddr').value = '';
+        document.getElementById('serviceType').value = '';
+        
+        navTo('aboutPage');
+    }
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking & Feedback Form</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #0f172a;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 10px;
+        }
+
+        /* Book Now Button styling */
+        .btn-book {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-book:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Review Stars styling */
+        .rating-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .stars {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .star {
+            font-size: 28px;
+            cursor: pointer;
+            color: #cbd5e1;
+            transition: color 0.1s;
+        }
+
+        .star.active, .star:hover {
+            color: #eab308;
+        }
+
+        /* Text inputs styling */
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            outline: 2px solid var(--primary-color);
+            border-color: transparent;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-submit:hover {
+            background-color: #059669;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Checkout & Feedback</h2>
+
+    <!-- 1. ORIGINAL BOOK NOW BUTTON -->
+    <div class="section">
+        <button class="btn-book" onclick="handleBooking()">⚡ Book Now</button>
+    </div>
+
+    <!-- 2. NEW CUSTOMER REVIEWS OPTION -->
+    <div class="section">
+        <span class="rating-title">Leave a Review</span>
+        <div class="stars" id="starRating">
+            <span class="star" data-value="1">&#9733;</span>
+            <span class="star" data-value="2">&#9733;</span>
+            <span class="star" data-value="3">&#9733;</span>
+            <span class="star" data-value="4">&#9733;</span>
+            <span class="star" data-value="5">&#9733;</span>
+        </div>
+        <label for="reviewText">Your Review:</label>
+        <textarea id="reviewText" rows="3" placeholder="Tell us about your experience..."></textarea>
+    </div>
+
+    <!-- 3. NEW SUGGESTIONS & OTHER OPTIONS TEXT BOX -->
+    <div class="section">
+        <label for="suggestions">Suggestions or Special Requests:</label>
+        <textarea id="suggestions" rows="2" placeholder="Any features or changes you'd like to see?"></textarea>
+        
+        <label for="otherOptions">Other Options / Notes:</label>
+        <input type="text" id="otherOptions" placeholder="e.g., Dietary restrictions, specific timings, etc.">
+        
+        <button class="btn-submit" onclick="submitFeedback()">Submit Feedback</button>
+    </div>
+</div>
+
+<script>
+    // Booking logic
+    function handleBooking() {
+        alert("🎉 Booking successful! Thank you.");
+    }
+
+    // Star Rating logic
+    const stars = document.querySelectorAll('.star');
+    let selectedRating = 0;
+
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            selectedRating = star.getAttribute('data-value');
+            updateStars(selectedRating);
+        });
+
+        star.addEventListener('mouseover', () => {
+            updateStars(star.getAttribute('data-value'));
+        });
+
+        star.addEventListener('mouseleave', () => {
+            updateStars(selectedRating);
+        });
+    });
+
+    function updateStars(rating) {
+        stars.forEach(star => {
+            if (star.getAttribute('data-value') <= rating) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+    }
+
+    // Feedback Submission logic
+    function submitFeedback() {
+        const reviewText = document.getElementById('reviewText').value;
+        const suggestions = document.getElementById('suggestions').value;
+        const otherOptions = document.getElementById('otherOptions').value;
+
+        if (selectedRating === 0 && !reviewText && !suggestions && !otherOptions) {
+            alert("Please fill out at least one field before submitting.");
+            return;
+        }
+
+        // Displaying data (In real application, you'd send this to your backend server)
+        console.log("Form Submitted:", {
+            rating: selectedRating + " Stars",
+            review: reviewText,
+            suggestions: suggestions,
+            otherOptions: otherOptions
+        });
+
+        alert("💌 Thank you for your feedback and suggestions!");
+        
+        // Clear fields after submit
+        document.getElementById('reviewText').value = '';
+        document.getElementById('suggestions').value = '';
+        document.getElementById('otherOptions').value = '';
+        selectedRating = 0;
+        updateStars(0);
+    }
+</script>
+
+</body>
+</html>
